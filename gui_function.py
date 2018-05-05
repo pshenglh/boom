@@ -1,6 +1,7 @@
 from gui_suply import Gui
 from PyQt5.QtWidgets import QFileDialog
 from data_process import handle_source_file, get_LB
+from data_process_new import CurveData
 import os
 
 class GuiFunction(Gui):
@@ -43,12 +44,18 @@ class GuiFunction(Gui):
         self.textBrowser_2.setText('')
 
     def data_process(self):
-        dist_dir = QFileDialog.getExistingDirectory(self,
+        try:
+            dist_dir = QFileDialog.getExistingDirectory(self,
                                                     '选择保存目录', './')
-        for f in self.files:
-            source_dir, file = os.path.split(f)
-            r = handle_source_file(dist_dir, file)
-            if r: self.textBrowser_2.append(r)
+            for f in self.files:
+                source_dir, file_name = os.path.split(f)
+                curve_data = CurveData(f)
+                curve_data.get_data()
+                curve_data.all_curve_files(dist_dir, file_name)
+                r = '%s..........done' % file_name
+                if r: self.textBrowser_2.append(r)
+        except Exception as e:
+            print(e)
 
     def uniq_values(self):
         if len(self.files) == 0:
