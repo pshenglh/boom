@@ -1,224 +1,116 @@
-# coding: utf-8
 import os
 import re
 
-def convert(base_dir):
-    dir = base_dir
-    files = os.listdir(dir)
-    for f in files:
-        p = re.compile(r'^\d{8}-\d{2}-R.txt$')
-        rst = p.match(f)
-        if rst is not None or f.startswith('DAG'):
-            source_file = generate_path(f, base_dir)
-            LB_file_name = 'LB-' + f
-            PT_file_name = 'PT-' + f
-            UP_file_name = 'UP-' + f
-            LNUP_file_name = 'LNUP-' + f
-            LB_file = generate_path(LB_file_name, base_dir)
-            PT_file = generate_path(PT_file_name, base_dir)
-            UP_file = generate_path(UP_file_name, base_dir)
-            LNUP_file = generate_path(LNUP_file_name, base_dir)
-            LB_list = []
-            PT_list = []
-            UP_list = []
-            LNUP_list = []
+class CurveData:
 
-            line_splited = get_datas(source_file)
-            dpdt = []
-            for d in line_splited:
-                dpdt.append(int(d[2]))
-            max_dpdt = max(dpdt)
-            up_end = False
-            for d in line_splited:
-                LB_data = d[7] + ',' + d[8] + '\n'
-                PT_data = d[0] + ',' + d[1] + '\n'
-                UP_data = d[9] + ',' + d[1] + '\n'
-                LNUP_data = d[11] + ',' + d[10] + '\n'
-                LB_list.append(LB_data)
-                PT_list.append(PT_data)
-                if not up_end:
-                    if int(d[2]) == max_dpdt:
-                        up_end = True
-                    else:
-                        UP_list.append(UP_data)
-                        LNUP_list.append(LNUP_data)
+    def __init__(self, file_path):
+        self.file_path = file_path
+        self.file_content = []
+        self.experiment_data_str = []
+        self.experiment_data_float = []
 
-            if not os.path.exists(LB_file):
-                with open(LB_file, 'w') as f:
-                    for d in LB_list:
-                        f.write(d)
+    def handle_file(self):
+        with open(self.file_path) as fp:
+            file_content = []
+            for line in fp:
+                file_content.append(line.strip('\n').split(','))
+        self.file_content = file_content
 
-            if not os.path.exists(PT_file):
-                with open(PT_file, 'w') as f:
-                    for d in PT_list:
-                        f.write(d)
-
-            if not os.path.exists(UP_file):
-                with open(UP_file, 'w') as f:
-                    for d in UP_list:
-                        f.write(d)
-
-            if not os.path.exists(LNUP_file):
-                with open(LNUP_file, 'w') as f:
-                    for d in LNUP_list:
-                        f.write(d)
-    print('done')
-
-def handle_source_file(base_dir, file):
-    if file.startswith('LB') or file.startswith('PT') or \
-        file.startswith('UP') or file.startswith('LNUP') or \
-            not file.endswith('.txt'):
-        return
-    source_file = generate_path(file, base_dir)
-    LB_file_name = 'LB-' + file
-    PT_file_name = 'PT-' + file
-    UP_file_name = 'UP-' + file
-    LNUP_file_name = 'LNUP-' + file
-    LB_file = generate_path(LB_file_name, base_dir)
-    PT_file = generate_path(PT_file_name, base_dir)
-    UP_file = generate_path(UP_file_name, base_dir)
-    LNUP_file = generate_path(LNUP_file_name, base_dir)
-    LB_list = []
-    PT_list = []
-    UP_list = []
-    LNUP_list = []
-
-    line_splited = get_datas(source_file)
-    dpdt = []
-    for d in line_splited:
-        dpdt.append(int(d[2]))
-    max_dpdt = max(dpdt)
-    up_end = False
-    for d in line_splited:
-        LB_data = d[7] + ',' + d[8] + '\n'
-        PT_data = d[0] + ',' + d[1] + '\n'
-        UP_data = d[9] + ',' + d[1] + '\n'
-        LNUP_data = d[11] + ',' + d[10] + '\n'
-        LB_list.append(LB_data)
-        PT_list.append(PT_data)
-        if not up_end:
-            if int(d[2]) == max_dpdt:
-                up_end = True
-            else:
-                UP_list.append(UP_data)
-                LNUP_list.append(LNUP_data)
-
-    if not os.path.exists(LB_file):
-        with open(LB_file, 'w') as f:
-            for d in LB_list:
-                f.write(d)
-
-    if not os.path.exists(PT_file):
-        with open(PT_file, 'w') as f:
-            for d in PT_list:
-                f.write(d)
-
-    if not os.path.exists(UP_file):
-        with open(UP_file, 'w') as f:
-            for d in UP_list:
-                f.write(d)
-
-    if not os.path.exists(LNUP_file):
-        with open(LNUP_file, 'w') as f:
-            for d in LNUP_list:
-                f.write(d)
-    return file + '.'*10 + 'done'
-
-
-
-def generate_path(f, base_dir):
-    return os.path.join(base_dir, f)
-
-def get_datas(source_file):
-    with open(source_file, 'r') as source:
-        skip_count = 2
-        datas = []
-        for l in source:
-            if skip_count != 0:
-                skip_count -= 1
-                continue
-            if l[0] == '"':
+    def get_data(self):
+        if not self.file_content:
+            self.handle_file()
+        file_content = self.file_content
+        exp_data_str = []
+        exp_data_float = []
+        for c in file_content[2:]:
+            try:
+                data_line = [float(d) for d in c]
+                exp_data_str.append(c)
+                exp_data_float.append(data_line)
+            except Exception as e:
                 break
-            line_splited = l.split(',')
-            datas.append(line_splited)
+        self.experiment_data_str = exp_data_str
+        self.experiment_data_float = exp_data_float
+        return exp_data_str, exp_data_float
 
-    return datas
+    def get_curve_data(self, raw_data, *data_index):
+        data_list = []
+        for i in data_index:
+            data_list.append([d[i] for d in raw_data])
+        return data_list
 
-def get_files(begin, base_dir):
-    files = os.listdir(base_dir)
-    if begin == 'PT':
-        p = re.compile(r'PT-.*.txt')
-    elif begin == 'LB':
-        p = re.compile(r'LB-.*.txt')
-    pt_files = []
-    for f in files:
-        rst = p.match(f)
-        if rst is not None:
-            pt_files.append(f)
-    return pt_files
+    def generate_file(self, file_path, raw_data, *data_index):
+        curve_data = self.get_curve_data(raw_data, *data_index)
+        data_one, data_two, *other = curve_data
+        with open(file_path, 'w') as fp:
+            for i, j in zip(data_one, data_two):
+                fp.write(i)
+                fp.write(',')
+                fp.write(j)
+                fp.write('\n')
 
-def get_time_to_10mpa():
-    pt_files = get_files('PT')
-    for f in pt_files:
-        path = os.path.join(BASE_DIR, f)
-        first_line = True
-        twenty = True
-        thirty = True
-        fifty = True
-        t_p = []
-        with open(path) as pf:
-            for l in pf:
-                datas = l.split(',')
-                time = float(datas[0])
-                pressure = int(float(datas[1].split('\n')[0]))
-                if first_line:
-                    t_p.append((time, pressure))
-                    first_line = False
-                if twenty and pressure == 20:
-                    t_p.append((time, pressure))
-                    twenty = False
-                if thirty and pressure == 30:
-                    t_p.append((time, pressure))
-                    thirty = False
-                if fifty and pressure == 50:
-                    t_p.append((time, pressure))
-                    fifty = False
-            t_p.append((time, float(datas[1].split('\n')[0])))
-        print(f, t_p)
+    def LB_data_curve(self, dist_path, file_name):
+        new_name = 'LB_' + file_name
+        file_path = os.path.join(dist_path, new_name)
+        self.generate_file(file_path, self.experiment_data_str, 7, 8)
 
-def get_LB(work_dir):
-    result = []
-    l_data = []
-    b_data = []
-    files = os.listdir(work_dir)
-    for f in files:
-        lb_f = re.compile(r'^LB-.*')
-        is_lbfile = lb_f.search(f)
-        if is_lbfile:
-            with open(os.path.join(work_dir, f), 'r') as lb_f:
-                for l in lb_f:
-                    s = l.split(',')
-                    b = float(s[0])
-                    l = float(s[1].split('\n')[0])
-                    l_data.append(l)
-                    b_data.append(b)
+    def PT_data_curve(self, dist_path, file_name):
+        new_name = 'PT_' + file_name
+        file_path = os.path.join(dist_path, new_name)
+        self.generate_file(file_path, self.experiment_data_str, 0, 1)
 
-            l_sum = 0
-            i = 0
-            for b in b_data:
-                if b > 0.1:
-                    break
-                i = b_data.index(b)
-                l_sum += l_data[i]
-            l_behind = l_data[i:]
-            l_average = l_sum/float(i+1)
-            l_max = max(l_behind)
-            b_bhind = b_data[i:]
-            j = l_behind.index(l_max)
-            bm = b_bhind[j]
-            lml0 = l_max/l_average
-            filename = f
-            s = '%s  l0:%.3f, l_max:%.3f, lm/l0:%.3f, bm:%.3f' % (filename, l_average, l_max, lml0, bm)
-            result.append(s)
-    return result
+    def UP_data_curve(self, dist_path, file_name):
+        new_name = 'UP_' + file_name
+        file_path = os.path.join(dist_path, new_name)
+        self.generate_file(file_path, self.experiment_data_str, 9, 1)
+
+    def LnUP_data_curve(self, dist_path, file_name):
+        new_name = 'LnUP_' + file_name
+        file_path = os.path.join(dist_path, new_name)
+        dPdt = self.get_curve_data(self.experiment_data_float, 2)
+        LnU_float = self.get_curve_data(self.experiment_data_float, 11)
+        max_index = dPdt[0].index(max(dPdt[0]))
+        LnU, LnP = self.get_curve_data(self.experiment_data_str, 11, 10)
+        for i, lnu in enumerate(LnU_float[0]):
+            if lnu > 0:
+                break
+        LnU = LnU[i:max_index+1]
+        LnP = LnP[i:max_index+1]
+        LnUP_list = list(zip(LnU, LnP))
+        self.generate_file(file_path, LnUP_list, 0, 1)
+
+    def all_curve_files(self, dist_path, file_name):
+        self.LB_data_curve(dist_path, file_name)
+        self.PT_data_curve(dist_path, file_name)
+        self.UP_data_curve(dist_path, file_name)
+        self.LnUP_data_curve(dist_path, file_name)
+
+
+class DataProcess:
+
+    def __init__(self, file_path):
+        self.curve_data = CurveData(file_path)
+        self.curve_data.get_data()
+
+    def LB_data(self):
+        B, L = self.curve_data.get_curve_data(self.curve_data.experiment_data_float, 7, 8)
+        B_initial = [b for b in B if b < 0.1]
+        L_initial = L[:len(B_initial)]
+        L_init_avg = sum(L_initial) / len(L_initial)
+        B_behind = B[len(B_initial):]
+        L_behind = L[len(B_initial):]
+        L_max = max(L_behind)
+        max_index = L_behind.index(L_max)
+        B_max = B_behind[max_index]
+        processing_combusion_value = L_max / L_init_avg
+        return L_init_avg, L_max, B_max, processing_combusion_value
+
+
+
+if __name__ == '__main__':
+    file_path = 'C:\\Users\pshen\OneDrive\projects\experiment_data_process\data\\20170502-24-R.txt'
+    dp = CurveData(file_path)
+    dp.get_data()
+    dp.LnUP_data_curve('./', os.path.basename(file_path))
+
 
