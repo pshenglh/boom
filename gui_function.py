@@ -1,7 +1,6 @@
 from gui_suply import Gui
 from PyQt5.QtWidgets import QFileDialog
-from data_process import handle_source_file, get_LB
-from data_process_new import CurveData
+from data_process import CurveData, DataProcess
 import os
 
 class GuiFunction(Gui):
@@ -44,23 +43,26 @@ class GuiFunction(Gui):
         self.textBrowser_2.setText('')
 
     def data_process(self):
-        try:
-            dist_dir = QFileDialog.getExistingDirectory(self,
-                                                    '选择保存目录', './')
-            for f in self.files:
-                source_dir, file_name = os.path.split(f)
+        dist_dir = QFileDialog.getExistingDirectory(self,
+                                                '选择保存目录', './')
+        for f in self.files:
+            source_dir, file_name = os.path.split(f)
+            try:
                 curve_data = CurveData(f)
                 curve_data.get_data()
                 curve_data.all_curve_files(dist_dir, file_name)
                 r = '%s..........done' % file_name
                 if r: self.textBrowser_2.append(r)
-        except Exception as e:
-            print(e)
+            except Exception as e:
+                continue
 
     def uniq_values(self):
-        if len(self.files) == 0:
-            rst = ['选择文件']
-        else:
-            rst = get_LB(os.path.dirname(self.files[0]))
-        for r in rst:
-            self.textBrowser_2.append(r)
+        for f in self.files:
+            filename = os.path.basename(f)
+            try:
+                data_proceser = DataProcess(f)
+                L_init, L_max, B_max, combusion = data_proceser.LB_data()
+                s = '%s: \tL0: %.3f\tLm: %.3f\tBm: %.3f\tLm/L0: %.3f' % (filename, L_init, L_max, B_max, combusion)
+                self.textBrowser_2.append(s)
+            except:
+                continue
