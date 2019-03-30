@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QMainWindow" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1232</width>
+    <height>791</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>文件列表</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTextBrowser" name="FileList"/>
+      </item>
+     </layout>
+    </item>
+    <item row="0" column="1">
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>处理结果</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTableWidget" name="ResultTable">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="font">
+         <font>
+          <italic>false</italic>
+          <underline>false</underline>
+         </font>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QHeaderView::section
+{
+spacing: 10px;
+background-color:lightgray;
+color: black;
+margin: 0px;
+text-align: center;
+};
+
+QTableView::item::section
+{
+spacing: 10px;
+background-color:lightblue;
+color: black;
+border: 1px solid black;
+margin: 0px;
+text-align: center;
+}</string>
+        </property>
+        <property name="editTriggers">
+         <set>QAbstractItemView::NoEditTriggers</set>
+        </property>
+        <property name="showGrid">
+         <bool>true</bool>
+        </property>
+        <property name="gridStyle">
+         <enum>Qt::SolidLine</enum>
+        </property>
+        <property name="sortingEnabled">
+         <bool>false</bool>
+        </property>
+        <attribute name="horizontalHeaderCascadingSectionResizes">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="horizontalHeaderDefaultSectionSize">
+         <number>100</number>
+        </attribute>
+        <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderCascadingSectionResizes">
+         <bool>true</bool>
+        </attribute>
+        <row>
+         <property name="text">
+          <string>20170502-28-R.txt</string>
+         </property>
+         <property name="foreground">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>0</red>
+            <green>0</green>
+            <blue>0</blue>
+           </color>
+          </brush>
+         </property>
+        </row>
+        <column>
+         <property name="text">
+          <string>L0</string>
+         </property>
+         <property name="textAlignment">
+          <set>AlignCenter</set>
+         </property>
+         <property name="background">
+          <color>
+           <red>173</red>
+           <green>173</green>
+           <blue>173</blue>
+          </color>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Lm</string>
+         </property>
+         <property name="textAlignment">
+          <set>AlignCenter</set>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Bm</string>
+         </property>
+         <property name="textAlignment">
+          <set>AlignCenter</set>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Lm/L0</string>
+         </property>
+         <property name="textAlignment">
+          <set>AlignCenter</set>
+         </property>
+        </column>
+        <item row="0" column="0">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="0" column="1">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="0" column="2">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item row="0" column="3">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1232</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="FileMenu">
+    <property name="title">
+     <string>文件导入</string>
+    </property>
+    <addaction name="ChooseDir"/>
+    <addaction name="ChooseFile"/>
+   </widget>
+   <widget class="QMenu" name="ConfigMenu">
+    <property name="title">
+     <string>参数配置</string>
+    </property>
+    <addaction name="B0Set"/>
+   </widget>
+   <widget class="QMenu" name="ProcessMenu">
+    <property name="title">
+     <string>数据处理</string>
+    </property>
+    <addaction name="CurveFiles"/>
+    <addaction name="FeatureValue"/>
+   </widget>
+   <widget class="QMenu" name="CleanMenu">
+    <property name="title">
+     <string>数据清理</string>
+    </property>
+    <addaction name="actionCleanResult"/>
+    <addaction name="actionCleanFile"/>
+   </widget>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>帮助</string>
+    </property>
+   </widget>
+   <addaction name="FileMenu"/>
+   <addaction name="ConfigMenu"/>
+   <addaction name="ProcessMenu"/>
+   <addaction name="CleanMenu"/>
+   <addaction name="menu"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="B0Set">
+   <property name="text">
+    <string>B0范围</string>
+   </property>
+  </action>
+  <action name="ChooseDir">
+   <property name="text">
+    <string>选择目录</string>
+   </property>
+  </action>
+  <action name="ChooseFile">
+   <property name="text">
+    <string>选择文件</string>
+   </property>
+  </action>
+  <action name="CurveFiles">
+   <property name="text">
+    <string>特征曲线</string>
+   </property>
+  </action>
+  <action name="FeatureValue">
+   <property name="text">
+    <string>特征值</string>
+   </property>
+  </action>
+  <action name="actionCleanResult">
+   <property name="text">
+    <string>CleanResult</string>
+   </property>
+  </action>
+  <action name="actionCleanFile">
+   <property name="text">
+    <string>CleanFile</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

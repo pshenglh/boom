@@ -1,5 +1,28 @@
 import os
-import re
+import json
+
+
+class Config(object):
+    def __init__(self):
+        self.config_file = 'config.ini'
+        try:
+            with open(self.config_file) as f:
+                self.data = json.load(f)
+            self.B_low = self.data['B_low']
+            self.B_high = self.data['B_hight']
+        except:
+            self.B_low = 0
+            self.B_high = 0.1
+            self.data = {
+                'B_low': self.B_low,
+                'B_hight': self.B_high
+            }
+
+    def save(self):
+        with open(self.config_file, 'w') as f:
+            f.write(json.dumps(self.data, indent=4))
+
+config = Config()
 
 class CurveData:
 
@@ -94,7 +117,7 @@ class DataProcess:
 
     def LB_data(self):
         B, L = self.curve_data.get_curve_data(self.curve_data.experiment_data_float, 7, 8)
-        B_initial = [b for b in B if b < 0.1]
+        B_initial = [b for b in B if (b > config.B_low and b < config.B_high)]
         L_initial = L[:len(B_initial)]
         L_init_avg = sum(L_initial) / len(L_initial)
         B_behind = B[len(B_initial):]
