@@ -13,8 +13,13 @@ class ConfigDialogFunction(ConfigDialog):
         self.textEdit_2.setText(str(config.B_high))
 
     def accept(self):
-        config.B_low = float(self.textEdit.toPlainText())
-        config.B_high = float(self.textEdit_2.toPlainText())
+        low = float(self.textEdit.toPlainText())
+        hight = float(self.textEdit_2.toPlainText())
+        if low >= hight:
+            return
+        else:
+            config.B_low = low
+            config.B_high = hight
         config.save()
         self.close()
 
@@ -60,7 +65,8 @@ class GuiFunction(Gui):
     def clean(self):
         self.files = []
         self.FileList.setText('')
-        self.ResultList.setText('')
+        self.ResultTable.clear()
+        self.row_count = 0
 
     def data_process(self):
         dist_dir = QFileDialog.getExistingDirectory(self,
@@ -83,18 +89,22 @@ class GuiFunction(Gui):
             try:
                 data_proceser = DataProcess(f)
                 datas = data_proceser.LB_data()
-                
+
                 if self.row_count == 0:
-                    for j, d in enumerate(datas):
-                        item = self.ResultTable.verticalHeaderItem(0)
-                        item.setText(_translate("Form", filename))
-                        item = self.ResultTable.item(0, j)
-                        item.setText(_translate("Form", str(round(d, 4))))
+                    try:
+                        for j, d in enumerate(datas):
+                            item = self.ResultTable.verticalHeaderItem(0)
+                            item.setText(_translate("Form", filename))
+                            item = self.ResultTable.item(0, j)
+                            item.setText(_translate("Form", str(round(d, 4))))
+                    except:
+                        for j, d in enumerate(datas):
+                            self.ResultTable.setItem(0, j, QtWidgets.QTableWidgetItem(str(round(d, 4))))
+                        self.ResultTable.setVerticalHeaderItem(0, QtWidgets.QTableWidgetItem(filename))
                 else:
                     rows = self.ResultTable.rowCount()
                     self.ResultTable.insertRow(rows)
                     for j, d in enumerate(datas):
-                        print(rows, j)
                         self.ResultTable.setItem(rows, j, QtWidgets.QTableWidgetItem(str(round(d, 4))))
                     self.ResultTable.setVerticalHeaderItem(rows, QtWidgets.QTableWidgetItem(filename))
                 self.row_count += 1
