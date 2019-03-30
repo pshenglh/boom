@@ -1,4 +1,5 @@
-from gui_bak import Ui_Form
+from gui.gui_bak import Ui_Form
+from gui.config import Ui_ConfigDialog
 from PyQt5 import QtWidgets
 
 class Gui(QtWidgets.QMainWindow, Ui_Form):
@@ -14,3 +15,11 @@ class Gui(QtWidgets.QMainWindow, Ui_Form):
     def setupUi(self, Form):
         Ui_Form.setupUi(self, Form)
 
+class ConfigDialog(QtWidgets.QDialog, Ui_ConfigDialog):
+    def __init__(self):
+        QtWidgets.QDialog.__init__(self)
+        self.setupUi(self)
+        self.retranslateUi(self)
+
+    def setupUi(self, ConfigDialog):
+        Ui_ConfigDialog.setupUi(self, ConfigDialog)

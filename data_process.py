@@ -17,6 +17,7 @@ class Config(object):
                 'B_low': self.B_low,
                 'B_hight': self.B_high
             }
+            self.save()
 
     def save(self):
         with open(self.config_file, 'w') as f:

@@ -1,8 +1,22 @@
-from gui_suply import Gui
+from gui_suply import Gui, ConfigDialog
 from PyQt5.QtWidgets import QFileDialog
 from PyQt5 import QtCore, QtGui, QtWidgets
 from data_process import CurveData, DataProcess
+from data_process import config
 import os
+
+
+class ConfigDialogFunction(ConfigDialog):
+    def __init__(self):
+        super().__init__()
+        self.textEdit.setText(str(config.B_low))
+        self.textEdit_2.setText(str(config.B_high))
+
+    def accept(self):
+        config.B_low = float(self.textEdit.toPlainText())
+        config.B_high = float(self.textEdit_2.toPlainText())
+        config.save()
+        self.close()
 
 class GuiFunction(Gui):
     '''该类继承可运行的gui的Py文件，主要功能为对gui空间行为
@@ -11,6 +25,8 @@ class GuiFunction(Gui):
     def __init__(self):
         super().__init__()
         self.files = []
+        self.dialog = ConfigDialogFunction()
+        self.row_count = 0
 
     def setupUi(self, Form):
         Gui.setupUi(self, Form)
@@ -19,7 +35,10 @@ class GuiFunction(Gui):
         self.CurveFiles.triggered.connect(lambda: self.data_process())
         self.FeatureValue.triggered.connect(lambda: self.uniq_values())
         self.CleanMenu.triggered.connect(lambda: self.clean())
+        self.B0Set.triggered.connect(lambda: self.config_dialog())
 
+    def config_dialog(self):
+        self.dialog.show()
 
     def get_files(self):
         files, _ = QFileDialog.getOpenFileNames(self,
@@ -59,22 +78,25 @@ class GuiFunction(Gui):
 
     def uniq_values(self):
         _translate = QtCore.QCoreApplication.translate
-        for i, f in enumerate(self.files):
+        for f in self.files:
             filename = os.path.basename(f)
             try:
                 data_proceser = DataProcess(f)
                 datas = data_proceser.LB_data()
-                if i == 0:
+                
+                if self.row_count == 0:
                     for j, d in enumerate(datas):
                         item = self.ResultTable.verticalHeaderItem(0)
                         item.setText(_translate("Form", filename))
-                        item = self.ResultTable.item(i, j)
+                        item = self.ResultTable.item(0, j)
                         item.setText(_translate("Form", str(round(d, 4))))
-                elif i > 0:
+                else:
                     rows = self.ResultTable.rowCount()
                     self.ResultTable.insertRow(rows)
                     for j, d in enumerate(datas):
-                        self.ResultTable.setItem(i, j, QtWidgets.QTableWidgetItem(str(round(d, 4))))
-                    self.ResultTable.setVerticalHeaderItem(i, QtWidgets.QTableWidgetItem(filename))
+                        print(rows, j)
+                        self.ResultTable.setItem(rows, j, QtWidgets.QTableWidgetItem(str(round(d, 4))))
+                    self.ResultTable.setVerticalHeaderItem(rows, QtWidgets.QTableWidgetItem(filename))
+                self.row_count += 1
             except Exception as err:
                 raise err
