@@ -1,4 +1,4 @@
-from gui_suply import Gui, ConfigDialog, InfoDialog
+from gui_suply import Gui, ConfigDialog, InfoDialog, ProcessDialog
 from PyQt5.QtWidgets import QFileDialog
 from PyQt5 import QtCore, QtGui, QtWidgets
 from data_process import CurveData, DataProcess
@@ -11,15 +11,18 @@ class ConfigDialogFunction(ConfigDialog):
         super().__init__()
         self.textEdit.setText(str(config.B_low))
         self.textEdit_2.setText(str(config.B_high))
+        self.textEdit_3.setText(str(config.decimal))
 
     def accept(self):
         low = float(self.textEdit.toPlainText())
         hight = float(self.textEdit_2.toPlainText())
+        decimal = int(self.textEdit_3.toPlainText())
         if low >= hight:
             return
         else:
             config.B_low = low
             config.B_high = hight
+            config.decimal = decimal
         config.save()
         self.close()
 
@@ -32,6 +35,7 @@ class GuiFunction(Gui):
         self.files = []
         self.config_dialog = ConfigDialogFunction()
         self.info_dialog = InfoDialog()
+        self.process_dialog = ProcessDialog()
         self.row_count = 0
 
     def setupUi(self, Form):
@@ -50,6 +54,9 @@ class GuiFunction(Gui):
 
     def show_info_dialog(self):
         self.info_dialog.show()
+
+    def show_process_dialog(self):
+        self.process_dialog.show()
 
     def get_files(self):
         files, _ = QFileDialog.getOpenFileNames(self,
@@ -84,17 +91,26 @@ class GuiFunction(Gui):
 
     def data_process(self):
         dist_dir = QFileDialog.getExistingDirectory(self,
-                                                '选择保存目录', './')
-        for f in self.files:
+                                                '选择保存目录', './output')
+        if not dist_dir or  not self.files:
+            return
+        self.process_dialog.show()
+        for i, f in enumerate(self.files):
             source_dir, file_name = os.path.split(f)
             try:
                 curve_data = CurveData(f)
                 curve_data.get_data()
                 curve_data.all_curve_files(dist_dir, file_name)
                 r = '%s..........done' % file_name
-                if r: self.ResultList.append(r)
+                if r:
+                    self.process_dialog.ProcessList.insertItem(i, r)
+                    self.process_dialog.progressBar.setValue(int(float(i+1)/len(self.files)*100))
             except Exception as e:
                 continue
+
+    def format_value(self, v):
+        fmt = '{:.%sf}' % config.decimal
+        return fmt.format(v)
 
     def uniq_values(self):
         _translate = QtCore.QCoreApplication.translate
@@ -110,19 +126,19 @@ class GuiFunction(Gui):
                             item = self.ResultTable.verticalHeaderItem(0)
                             item.setText(_translate("Form", filename))
                             item = self.ResultTable.item(0, j)
-                            item.setText(_translate("Form", str(round(d, 4))))
+                            item.setText(_translate("Form", self.format_value(d)))
                         item = self.ResultTable.item(0, j+1)
                         item.setText(_translate("Form", '{}-{}'.format(config.B_low, config.B_high)))
                     except:
                         for j, d in enumerate(datas):
-                            self.ResultTable.setItem(0, j, QtWidgets.QTableWidgetItem(str(round(d, 4))))
+                            self.ResultTable.setItem(0, j, QtWidgets.QTableWidgetItem(self.format_value(d)))
                         self.ResultTable.setItem(0, j+1, QtWidgets.QTableWidgetItem('{}-{}'.format(config.B_low, config.B_high)))
                         self.ResultTable.setVerticalHeaderItem(0, QtWidgets.QTableWidgetItem(filename))
                 else:
                     rows = self.ResultTable.rowCount()
                     self.ResultTable.insertRow(rows)
                     for j, d in enumerate(datas):
-                        self.ResultTable.setItem(rows, j, QtWidgets.QTableWidgetItem(str(round(d, 4))))
+                        self.ResultTable.setItem(rows, j, QtWidgets.QTableWidgetItem(self.format_value(d)))
                     self.ResultTable.setItem(rows, j + 1,
                                              QtWidgets.QTableWidgetItem('{}-{}'.format(config.B_low, config.B_high)))
                     self.ResultTable.setVerticalHeaderItem(rows, QtWidgets.QTableWidgetItem(filename))

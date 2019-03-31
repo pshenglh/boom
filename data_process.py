@@ -10,19 +10,23 @@ class Config(object):
                 self.data = json.load(f)
             self.B_low = self.data['B_low']
             self.B_high = self.data['B_hight']
+            self.decimal = self.data['decimal']
         except:
             self.B_low = 0
             self.B_high = 0.1
+            self.decimal = 4
             self.data = {
                 'B_low': self.B_low,
-                'B_hight': self.B_high
+                'B_hight': self.B_high,
+                'decimal': self.decimal
             }
             self.save()
 
     def save(self):
         self.data = {
             'B_low': self.B_low,
-            'B_hight': self.B_high
+            'B_hight': self.B_high,
+            'decimal': self.decimal
         }
         with open(self.config_file, 'w') as f:
             f.write(json.dumps(self.data, indent=4))

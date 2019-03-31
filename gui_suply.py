@@ -1,6 +1,7 @@
 from gui.gui_bak import Ui_Form
 from gui.config import Ui_ConfigDialog
 from gui.info import Ui_InfoDialog
+from gui.process import Ui_ProcessDialog
 from PyQt5 import QtWidgets
 
 class Gui(QtWidgets.QMainWindow, Ui_Form):
@@ -39,3 +40,14 @@ class InfoDialog(QtWidgets.QDialog, Ui_InfoDialog):
 
     def setupUi(self, ConfigDialog):
         Ui_InfoDialog.setupUi(self, ConfigDialog)
+
+
+class ProcessDialog(QtWidgets.QDialog, Ui_ProcessDialog):
+    def __init__(self):
+        QtWidgets.QDialog.__init__(self)
+        self.setupUi(self)
+        self.pushButton.clicked.connect(self.close)
+        self.retranslateUi(self)
+
+    def setupUi(self, ConfigDialog):
+        Ui_ProcessDialog.setupUi(self, ConfigDialog)

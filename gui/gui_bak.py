@@ -193,7 +193,7 @@ class Ui_Form(object):
         self.ProcessMenu.setTitle(_translate("Form", "数据处理"))
         self.CleanMenu.setTitle(_translate("Form", "数据清理"))
         self.menu.setTitle(_translate("Form", "帮助"))
-        self.B0Set.setText(_translate("Form", "B0范围"))
+        self.B0Set.setText(_translate("Form", "参数配置"))
         self.ChooseDir.setText(_translate("Form", "选择目录"))
         self.ChooseFile.setText(_translate("Form", "选择文件"))
         self.CurveFiles.setText(_translate("Form", "特征曲线"))
