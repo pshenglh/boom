@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1232</width>
+    <width>966</width>
     <height>791</height>
    </rect>
   </property>
@@ -28,7 +28,14 @@
        </widget>
       </item>
       <item>
-       <widget class="QTextBrowser" name="FileList"/>
+       <widget class="QTextBrowser" name="FileList">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -100,7 +107,7 @@ text-align: center;
          <bool>false</bool>
         </attribute>
         <attribute name="horizontalHeaderStretchLastSection">
-         <bool>false</bool>
+         <bool>true</bool>
         </attribute>
         <attribute name="verticalHeaderCascadingSectionResizes">
          <bool>true</bool>
@@ -158,6 +165,14 @@ text-align: center;
           <set>AlignCenter</set>
          </property>
         </column>
+        <column>
+         <property name="text">
+          <string>B值范围</string>
+         </property>
+         <property name="textAlignment">
+          <set>AlignCenter</set>
+         </property>
+        </column>
         <item row="0" column="0">
          <property name="text">
           <string>0</string>
@@ -178,6 +193,11 @@ text-align: center;
           <string>0</string>
          </property>
         </item>
+        <item row="0" column="4">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
        </widget>
       </item>
      </layout>
@@ -189,7 +209,7 @@ text-align: center;
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1232</width>
+     <width>966</width>
      <height>30</height>
     </rect>
    </property>
@@ -217,13 +237,14 @@ text-align: center;
     <property name="title">
      <string>数据清理</string>
     </property>
-    <addaction name="actionCleanResult"/>
-    <addaction name="actionCleanFile"/>
+    <addaction name="CleanResult"/>
+    <addaction name="CleanAll"/>
    </widget>
    <widget class="QMenu" name="menu">
     <property name="title">
      <string>帮助</string>
     </property>
+    <addaction name="Info"/>
    </widget>
    <addaction name="FileMenu"/>
    <addaction name="ConfigMenu"/>
@@ -257,14 +278,19 @@ text-align: center;
     <string>特征值</string>
    </property>
   </action>
-  <action name="actionCleanResult">
+  <action name="CleanResult">
    <property name="text">
-    <string>CleanResult</string>
+    <string>清除表单</string>
    </property>
   </action>
-  <action name="actionCleanFile">
+  <action name="CleanAll">
    <property name="text">
-    <string>CleanFile</string>
+    <string>全部清除</string>
+   </property>
+  </action>
+  <action name="Info">
+   <property name="text">
+    <string>关于</string>
    </property>
   </action>
  </widget>

@@ -20,6 +20,10 @@ class Config(object):
             self.save()
 
     def save(self):
+        self.data = {
+            'B_low': self.B_low,
+            'B_hight': self.B_high
+        }
         with open(self.config_file, 'w') as f:
             f.write(json.dumps(self.data, indent=4))
 

@@ -1,4 +1,4 @@
-from gui_suply import Gui, ConfigDialog
+from gui_suply import Gui, ConfigDialog, InfoDialog
 from PyQt5.QtWidgets import QFileDialog
 from PyQt5 import QtCore, QtGui, QtWidgets
 from data_process import CurveData, DataProcess
@@ -30,7 +30,8 @@ class GuiFunction(Gui):
     def __init__(self):
         super().__init__()
         self.files = []
-        self.dialog = ConfigDialogFunction()
+        self.config_dialog = ConfigDialogFunction()
+        self.info_dialog = InfoDialog()
         self.row_count = 0
 
     def setupUi(self, Form):
@@ -39,11 +40,16 @@ class GuiFunction(Gui):
         self.ChooseFile.triggered.connect(lambda: self.get_files())
         self.CurveFiles.triggered.connect(lambda: self.data_process())
         self.FeatureValue.triggered.connect(lambda: self.uniq_values())
-        self.CleanMenu.triggered.connect(lambda: self.clean())
-        self.B0Set.triggered.connect(lambda: self.config_dialog())
+        self.CleanResult.triggered.connect(lambda: self.clean_results())
+        self.CleanAll.triggered.connect(lambda: self.clean_all())
+        self.B0Set.triggered.connect(lambda: self.show_config_dialog())
+        self.Info.triggered.connect(lambda: self.show_info_dialog())
 
-    def config_dialog(self):
-        self.dialog.show()
+    def show_config_dialog(self):
+        self.config_dialog.show()
+
+    def show_info_dialog(self):
+        self.info_dialog.show()
 
     def get_files(self):
         files, _ = QFileDialog.getOpenFileNames(self,
@@ -62,10 +68,18 @@ class GuiFunction(Gui):
             self.FileList.append(f)
             self.files.append(os.path.join(d, f))
 
-    def clean(self):
+    def clean_all(self):
         self.files = []
         self.FileList.setText('')
-        self.ResultTable.clear()
+        # self.ResultTable.clear()
+        for r in range(self.ResultTable.rowCount(), 0, -1):
+            self.ResultTable.removeRow(r)
+        self.row_count = 0
+
+    def clean_results(self):
+        # self.ResultTable.clear()
+        for r in range(self.ResultTable.rowCount(), 0, -1):
+            self.ResultTable.removeRow(r)
         self.row_count = 0
 
     def data_process(self):
@@ -97,15 +111,20 @@ class GuiFunction(Gui):
                             item.setText(_translate("Form", filename))
                             item = self.ResultTable.item(0, j)
                             item.setText(_translate("Form", str(round(d, 4))))
+                        item = self.ResultTable.item(0, j+1)
+                        item.setText(_translate("Form", '{}-{}'.format(config.B_low, config.B_high)))
                     except:
                         for j, d in enumerate(datas):
                             self.ResultTable.setItem(0, j, QtWidgets.QTableWidgetItem(str(round(d, 4))))
+                        self.ResultTable.setItem(0, j+1, QtWidgets.QTableWidgetItem('{}-{}'.format(config.B_low, config.B_high)))
                         self.ResultTable.setVerticalHeaderItem(0, QtWidgets.QTableWidgetItem(filename))
                 else:
                     rows = self.ResultTable.rowCount()
                     self.ResultTable.insertRow(rows)
                     for j, d in enumerate(datas):
                         self.ResultTable.setItem(rows, j, QtWidgets.QTableWidgetItem(str(round(d, 4))))
+                    self.ResultTable.setItem(rows, j + 1,
+                                             QtWidgets.QTableWidgetItem('{}-{}'.format(config.B_low, config.B_high)))
                     self.ResultTable.setVerticalHeaderItem(rows, QtWidgets.QTableWidgetItem(filename))
                 self.row_count += 1
             except Exception as err:
